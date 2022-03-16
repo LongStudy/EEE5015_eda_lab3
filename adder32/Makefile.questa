@@ -1,0 +1,38 @@
+DUT  = ../../../design/verilog/adder32.v
+TB   = ./adder32_tb_random.v
+TEST = ramdom
+
+TOP_ENV = adder32_tb_random
+SEED      ?= $(shell date +%s)
+
+
+all: build run
+
+# ---- step one : build
+build: work_library  dut_compile  test_compile  compile_check
+
+work_library:
+	vlib work
+
+dut_compile:
+	@-rm -rf compile.log
+	vlog +cover +acc=a $(DUT) | tee -a compile.log
+	#vlog +cover +acc=a -f dut_verilog.f | tee -a compile.log
+	#vcom +cover +acc=a -f dut_vhdl.f    | tee -a compile.log
+
+test_compile:
+	vlog -sv $(TB) | tee -a compile.log
+	#vlog -sv -f tb.f | tee -a compile.log
+
+compile_check:
+	@echo "Compile finish, check the compile.log to find if there is any error"
+	@-grep -i error compile.log || (true; echo "Compile PASS!")
+
+# ---- setp two: run simulation
+run:
+	vsim -coverage -assertdebug -sv_seed $(SEED) -c $(TOP_ENV) \
+		   -pli  $(VERDI_PLI) -do questa_sim.do -l simulation.log 
+
+
+clean:
+	@-rm -rf work *.log vsim.wlf transcript 

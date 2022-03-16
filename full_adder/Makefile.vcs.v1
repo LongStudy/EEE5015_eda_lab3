@@ -1,0 +1,19 @@
+# Makefile for simulate the full_adder.v with the simulatior VCS
+
+# variable definition
+DUT =../../../design/verilog/full_adder.v 
+TB  =./full_adder_tb.v ./timescale.v
+
+# target : dependency
+all: compile simulate
+
+# target:
+# command
+compile:
+	vcs -sverilog -debug_all $(DUT) $(TB) -l com.log
+
+simulate:
+	./simv -l sim.log
+
+clean:
+	@-rm -rf *.log  csrc simv simv.daidir ucli.key

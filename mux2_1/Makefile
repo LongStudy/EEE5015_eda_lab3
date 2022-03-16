@@ -1,0 +1,30 @@
+# Makefile for simulate the mux2_1.v with the simulator VCS
+
+all: compile simulate
+
+compile:
+	vcs -sverilog -debug_all timescale.v mux2_1.v mux2_1_tb.v -l com.log
+
+simulate:
+	./simv -l sim.log
+
+run_cov: compile_coverage simulate_coverage
+
+
+run_dve:
+	dve -vpd vcdplus.vpd &
+
+compile_coverage:
+	vcs -debug_all -cm line+cond+fsm+tgl+branch -lca timescale.v mux2_1.v mux2_1_tb.v -l com.log
+
+simulate_coverage:
+	./simv -cm line+cond+fsm+tgl+branch -lca -cm_log cm.log -l sim.log
+
+report_cov:
+	urg -dir simv.vdb -format both -report coverage
+
+dve_cov:
+	dve -cov -covdir simv.vdb -lca
+
+clean:
+	rm -rf *.log  csrc simv simv.daidir ucli.key vcdplus.vpd DVEfiles coverage simv.vdb

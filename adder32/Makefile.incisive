@@ -1,0 +1,16 @@
+TOP = adder32_tb
+SEED = 1
+
+all: build run
+
+build:
+	irun -elaborate -sv +access+r +define+SYSTEMVERILOG -v200x  \
+		   ../../../design/verilog/adder32.v adder32_tb.v -top $(TOP) \
+			 -nowarn MRSTAR -nowarn ZROMCV -nowarn CUDEFB -nowarn UEXPSC \
+			 -l irun_build.log 
+
+run:
+	irun -R -licqueue -notimezeroasrtmsg -access +rwc -gui -seed $(SEED) +seed=$(SEED) -input ./ius.tcl -l irun_run.log
+
+clean:
+	rm -rf INCA_libs irun.key irun_run.log irun_build.log waves.shm 
